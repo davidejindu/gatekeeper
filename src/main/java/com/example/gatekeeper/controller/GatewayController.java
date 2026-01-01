@@ -1,6 +1,7 @@
 package com.example.gatekeeper.controller;
 
 
+import com.example.gatekeeper.service.CircuitBreakerService;
 import com.example.gatekeeper.service.RateLimiterService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,20 +21,19 @@ public class GatewayController {
             "test-key-3"
     );
 
-    private final WebClient webClient;
     private final RateLimiterService rateLimiterService;
+    private final CircuitBreakerService circuitBreakerService;
 
-    public GatewayController(WebClient.Builder webClientBuilder,
-                             RateLimiterService rateLimiterService) {
-        this.webClient = webClientBuilder
-                .baseUrl("http://localhost:8081")
-                .build();
+    public GatewayController(RateLimiterService rateLimiterService,
+                             CircuitBreakerService circuitBreakerService) {
+
         this.rateLimiterService = rateLimiterService;
+        this.circuitBreakerService = circuitBreakerService;
     }
 
 
     @GetMapping("/**")
-    public Mono<ResponseEntity<String>> proxyGet(@RequestHeader(value = "X-API-KEY", required = false) String apiKey) {
+    public Mono<ResponseEntity<String>> proxyGet(@RequestHeader(value = "X-API-Key", required = false) String apiKey) {
 
         if (apiKey == null || !VALID_API_KEYS.contains(apiKey)) {
             return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -46,16 +46,16 @@ public class GatewayController {
                         return Mono.just(ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                                 .body("Exceeded Request Limit"));
                     }
-                    return webClient.post()
-                            .uri("/post")
-                            .retrieve()
-                            .toEntity(String.class);
+
+                    return circuitBreakerService.proxyRequest("GET", "/get", null)
+                            .map(ResponseEntity::ok);
                 });
+
 
     }
 
     @PostMapping("/**")
-    public Mono<ResponseEntity<String>> proxyPost(@RequestHeader(value = "X-API-KEY", required = false)
+    public Mono<ResponseEntity<String>> proxyPost(@RequestHeader(value = "X-API-Key", required = false)
                                                   String apiKey, @RequestBody(required = false) String body) {
 
 
@@ -71,18 +71,15 @@ public class GatewayController {
                                 .body("Exceeded Request Limit"));
                     }
 
-
-                    return webClient.post()
-                            .uri("/post")
-                            .bodyValue(body != null ? body : "")
-                            .retrieve().toEntity(String.class);
+                    return circuitBreakerService.proxyRequest("POST", "/post", body)
+                            .map(ResponseEntity::ok);
 
                 });
 
     }
 
     @GetMapping("/limits")
-    public Mono<ResponseEntity<String>> checkLimits(@RequestHeader (value = "X-API-KEY",required = false)
+    public Mono<ResponseEntity<String>> checkLimits(@RequestHeader (value = "X-API-Key",required = false)
                                                     String apiKey) {
         if (apiKey == null || !VALID_API_KEYS.contains(apiKey)) {
             return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED)
@@ -94,5 +91,7 @@ public class GatewayController {
                         "remaining: " + remaining + " limit:100, window:60s"
                 ));
     }
+
+
 
 }
