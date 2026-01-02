@@ -2,8 +2,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-    - "6379:6379"
-
+      - "6379:6379"
     command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
@@ -27,13 +26,20 @@ services:
       timeout: 3s
       retries: 5
 
-
   httpbin:
     image: kennethreitz/httpbin
     ports:
       - "8081:80"
 
+  k6:
+    image: grafana/k6:latest
+    networks:
+      - default
+    volumes:
+      - ./k6:/scripts
+
+    profiles:
+      - tools
+
 volumes:
   postgres_data:
-
-
