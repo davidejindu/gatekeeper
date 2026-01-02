@@ -15,7 +15,7 @@ GateKeeper is a reactive API Gateway that provides:
 - **Circuit breaker pattern** for fault tolerance
 - **Dockerized deployment** ready for cloud environments
 
-## ⚡ Performance Highlights
+## Performance Highlights
 
 - **20,000+ requests/second** sustained throughput
 - **Sub-6ms P99 latency** under load
