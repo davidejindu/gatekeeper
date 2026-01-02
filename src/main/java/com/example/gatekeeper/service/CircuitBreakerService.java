@@ -15,7 +15,9 @@ public class CircuitBreakerService {
     public CircuitBreakerService(ReactiveCircuitBreakerFactory circuitBreakerFactory,
                                  WebClient.Builder webClientBuilder) {
         this.circuitBreaker = circuitBreakerFactory.create("backend");
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8081").build();
+        this.webClient = webClientBuilder
+                .baseUrl(System.getenv().getOrDefault("HTTPBIN_URL", "http://localhost:8081"))
+                .build();
     }
 
     public Mono<String> proxyRequest(String method, String uri, String body) {
