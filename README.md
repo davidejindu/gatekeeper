@@ -1,4 +1,4 @@
-# GateKeeper 🚀
+# GateKeeper
 
 A high-performance, production-ready API Gateway built with Spring WebFlux, designed for scalability and fault tolerance.
 
@@ -7,7 +7,7 @@ A high-performance, production-ready API Gateway built with Spring WebFlux, desi
 [![Docker](https://img.shields.io/badge/Docker-Compose-blue.svg)](https://www.docker.com/)
 [![AWS](https://img.shields.io/badge/AWS-EC2-orange.svg)](https://aws.amazon.com/ec2/)
 
-## 🎯 Overview
+## Overview
 
 GateKeeper is a reactive API Gateway that provides:
 - **High-throughput request routing** with non-blocking I/O
@@ -22,7 +22,7 @@ GateKeeper is a reactive API Gateway that provides:
 - **99% rate limiting accuracy** under concurrent load
 - **90% reduction in cascading failures** via circuit breakers
 
-## 🏗️ Architecture
+## Architecture
 
 ### Tech Stack
 - **Runtime:** Java 17
@@ -66,7 +66,7 @@ GateKeeper is a reactive API Gateway that provides:
 └────────────┘
 ```
 
-## 📊 Performance Testing Results
+## Performance Testing Results
 
 ### Throughput Test
 Achieved **20,000 req/sec** with **sub-6ms P99 latency** using k6 load testing.
